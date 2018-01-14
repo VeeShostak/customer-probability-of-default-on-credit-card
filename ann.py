@@ -1,3 +1,15 @@
+'''
+            Artificial Neural Network for Classification
+Used to solve a data analytics challenge for a bank looking to determine consumer credit risk.
+
+This is an Artificial Neural Network that can predict, based on 24 attributes of
+a customer, if an individual customer will default on their payment next month for their credit card.
+
+In addition, we are be able to rank all the customers of the bank, based on 
+their probability of default. To do that, we use the right Deep Learning model, 
+one that is based on a probabilistic approach (need the output layer(dependent variable)
+to use the sigmoid activation function
+'''
 
 # In[1]:
 
@@ -91,3 +103,74 @@ Afterwards, you can call its transform() method to apply the transformation to a
 X_train = sc.fit_transform(X_train) # Fit to data, then transform it.
 X_test = sc.transform(X_test) # Perform standardization by centering and scaling
 
+
+# In[6]:
+# Intitialize the ANN
+
+# ===========================
+# Make the ANN
+# ===========================
+
+# Importing the Keras libraries and packages
+import keras
+from keras.models import Sequential # to initialize ANN
+from keras.layers import Dense # to create layers in ANN
+
+# Initialising the ANN (we will define it as a sequence of layers or you can define a graph)
+classifier = Sequential()
+'''
+1. Dense() function will randomly initialize the weights to small numbers close to 0 (but not 0)
+2. place each feature in one input node e.g: 11 input vars => 11 input nodes
+3. farward propagation pass inputs from left to right where the neuron will be activated in way
+   where impact of each neurons activation is limited by the weights. (sum allweights, apply activation function)
+   using rectifier func for input layer and sigmoid for outer layer(to get probabilities of customer leaving or staying) 
+4. compare predicted result to actual
+5. back propagation from right to left. update the weights according to how much they are responsible for he error
+   The learnign rate decides by how much we update the weights
+6. repeat steps 1-5 and update weights after each observation (row) (reinforcement learning)
+   Or: repeat steps 1-5 and updatee the weights only after a batch of observations (Batch learning)
+7. When the whole training (all rows of data) passed through the ANN that makes an epoch. Redo more epochs
+'''
+# use stochastic gradient decscent
+
+
+#Choose Number of nodes in hidden layer: as average number of nodes in hidden and output layer
+#Or experiment with parameter tuning, ross validation techniques
+# (23 + 1)/2 for hidden layer
+
+# initialize weights randomly close to 0: kernel_initializer = 'uniform'
+
+# using rectifier activation func for input layter and sigmoid for outer layer(to get probabilities) 
+
+
+# Add the input layer AND the first hidden layer. (for initial layer specify the input nodes since we have no prev layer)
+classifier.add(Dense(units = 12, kernel_initializer = 'uniform', activation = 'relu', input_dim = 23))
+
+# Add the second hidden layer (use prev layer as input nodes)
+classifier.add(Dense(units = 12, kernel_initializer = 'uniform', activation = 'relu'))
+
+# Add the output layer (NOTE: if 3 encoded categories for dependent variable need 3 nodes and softmax activator func)
+# choose sigmoid just like in logistic regression
+classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+
+
+# In[7]:
+# Compile the ANN (apply Stochastic gradient descent for back propagation)
+# Stochastic gradient descent algorithm = adam. 
+# loss function within adam alg, based on loss function that we need to optimize to find optimal weights 
+
+# (for simple linear regression loss func is sum of squared errors. 
+# in ML(perceptron NN using sigmoid activation function you obtain a logistic regression model):
+# looking into stochastic gradient descent loss func is NOT sum of squared errors but is a 
+# logarithmic function called logarithmic loss )
+
+# so use binary logarithmic loss func b/c (binary_entropy = dependent var has binary outcome, if i categories = categorical_crossentropy)
+# criteria to evaluate our model metrics = ['accuracy'] (after weights updated, algo uses accuracy criterion to improve models performance) (when we fit accuracy will increase little by litle until reach top accuracy since we chose accuracy metric)
+classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+
+# In[8]:
+# Fit the ANN to the Training set (experimment with batch size and epochs)
+# batch_size = 10, epochs = 100
+# loss: 0.4234 - acc: 0.8193
+classifier.fit(X_train, y_train, batch_size = 10, epochs = 100)
