@@ -174,3 +174,40 @@ classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = [
 # batch_size = 10, epochs = 100
 # loss: 0.4234 - acc: 0.8193
 classifier.fit(X_train, y_train, batch_size = 10, epochs = 100)
+
+
+# In[9]:
+# save the model
+
+'''
+ Model weights are saved to HDF5 format.(grid format that is ideal for storing multi-dimensional arrays of numbers.)
+ HDF5 lets you store huge amounts of numerical data, and easily manipulate that data from NumPy.
+ 
+ The model structure can be described and saved using two different formats: JSON and YAML.
+ '''
+
+from keras.models import model_from_json
+
+# serialize model to JSON
+model_json = classifier.to_json()
+with open("saved-model/model.json", "w") as json_file:
+    json_file.write(model_json)
+# serialize weights to HDF5
+classifier.save_weights("saved-model/model.h5")
+print("Saved model to disk")
+
+# In[10]:
+# Load the model
+
+# load json and create model
+json_file = open('saved-model/model.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+
+loaded_model = model_from_json(loaded_model_json)
+# load weights into new model
+loaded_model.load_weights("saved-model/model.h5")
+print("Loaded model from disk")
+
+# compile loaded model
+loaded_model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
