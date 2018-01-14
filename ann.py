@@ -211,3 +211,20 @@ print("Loaded model from disk")
 
 # compile loaded model
 loaded_model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+# In[11]:
+# make predictions
+
+# Predict the Test set results
+y_pred = loaded_model.predict(X_test) # gives probability of defaulting next month
+
+y_pred = (y_pred > 0.5) # choose threshold to convert to true or false
+
+# Make the Confusion Matrix to evaluate
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+
+correct = cm[0][0] + cm[1][1]
+incorrect = cm[0][1] + cm[1][0]
+accuracy = (correct) / 6000 # tested on number of observations (0.2 * observationsInDataset)
+# 82%
